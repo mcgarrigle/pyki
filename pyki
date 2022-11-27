@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import argparse
+from command import Command
+
+def main(args):
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest='command')
+
+    p = subparsers.add_parser('ca', help='generate root key and cert')
+    p.add_argument('--dn', nargs='?')
+    p.add_argument('arguments', nargs='?')
+
+    p = subparsers.add_parser('cert', help='generate key and cert')
+    p.add_argument('arguments', nargs='?')
+
+    args = parser.parse_args()
+    # print(args.command, args.dn, args.arguments)
+
+    c = Command()
+    c.run(args)
+
+if __name__ == "__main__":
+    main(sys.argv)
