@@ -14,11 +14,12 @@ def main(args):
     p.add_argument('arguments', nargs='?')
 
     p = subparsers.add_parser('cert', help='generate key and cert')
+    p.add_argument('--san', nargs='*')
     p.add_argument('arguments', nargs='?')
 
     args = parser.parse_args()
-    # print(args.command, args.dn, args.arguments)
-
+    print(args.command, args.san, args.arguments)
+    exit(0)
     c = Command()
     c.run(args)
 
