@@ -19,6 +19,6 @@ class SAN:
         items = [ self.item(element) for element in self.san ]
         return x509.SubjectAlternativeName(items)
 
-subjects = [ "DNS:www.cryptography.io", "IP:192.168.1.1" ]
-san = SAN(subjects)
-print(san.value)
+# subjects = [ "DNS:www.cryptography.io", "IP:192.168.1.1" ]
+# san = SAN(subjects)
+# print(san.value)

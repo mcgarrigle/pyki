@@ -14,24 +14,22 @@ class DN:
     }
 
     def __init__(self, dn):
-        self.dn = dn
+        attributes = [ self.attribute(self.chop(s, "=")) for s in self.chop(dn, ",") ]
+        self.name = x509.Name(attributes)
 
-    def element(self, s):
-        (name, value) = [ e.strip() for e in s.split("=") ]
+    def chop(self, s, c):
+        return [ e.strip() for e in s.split(c) ]
+
+    def attribute(self, pair):
+        (name, value) = pair
         return x509.NameAttribute(DN.mapping[name], value)
 
     def oid(self):
-        elements = [ self.element(s.strip()) for s in self.dn.split(",") ]
-        return x509.Name(elements)
+        return self.name
 
+    def __str__(self):
+        return self.name.rfc4514_string()
 
-#builder = builder.subject_name(x509.Name([
-#    x509.NameAttribute(NameOID.COMMON_NAME, u'cryptography.io'),
-#]))
-
-#dn=[ x509.NameAttribute(NameOID.COMMON_NAME, u'cryptography'), x509.NameAttribute(NameOID.DOMAIN_COMPONENT, u'example') , x509.NameAttribute(NameOID.DOMAIN_COMPONENT, u'com') ]
+#dn = DN("CN =foo, OU= blue team ,DC = example , DC=org")
+#print(dn.oid())
 #print(dn)
-
-dn = DN("CN =foo, OU=hq ,DC = example , DC=org")
-
-print(dn.oid())
