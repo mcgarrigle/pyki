@@ -19,17 +19,35 @@ class Certificate:
             new.cert = x509.load_pem_x509_certificate(pem)
         return new
 
-    def create(self, dn, private_key, san):
-        self.dn = DN(dn)
-        self.san = SAN(san)
+    def save(self, path):
+        with open(path, "w") as f:
+            f.write(self.pem())
 
-    def sign(self, ca_certificate, ca_private_key):
-        pass
+    @staticmethod
+    def create(subject, private_key, extensions):
+        one_day = datetime.timedelta(1, 0, 0)
+        public_key = private_key.public()
+        builder = x509.CertificateBuilder()
+        builder = builder.subject_name(DN(subject).name)
+        builder = builder.public_key(public_key)
+        builder = builder.not_valid_before(datetime.datetime.today() - one_day)
+        builder = builder.not_valid_after(datetime.datetime.today() + (one_day * 30))
+        builder = builder.serial_number(x509.random_serial_number())
+        for extension in extensions:
+            builder = builder.add_extension(extension, critical=True)
+        new = Certificate()
+        new.builder = builder
+        return new
+
+    def sign(self, issuer, ca_private_key):
+        self.builder = self.builder.issuer_name(DN(issuer).name)
+        self.cert = self.builder.sign(
+           private_key=ca_private_key.private(),
+           algorithm=hashes.SHA256(),
+        )
 
     def pem(self):
        return self.cert.public_bytes(encoding=serialization.Encoding.PEM).decode("utf-8")
 
-c = Certificate.load('/etc/ssl/certs/GTS_Root_R2.pem')
-print(c.pem())
-
-print(c.cert.subject.rfc4514_string())
+    def __repr__(self):
+      return repr(self.cert)

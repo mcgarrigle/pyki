@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+
 from command import Command
 
 def main():
@@ -10,7 +11,7 @@ def main():
     subparser = parser.add_subparsers(dest='command')
 
     p = subparser.add_parser('key', help='generate private key')
-    p.add_argument('--key', required=True, help="output path for private key with PEM encoding")
+    p.add_argument('-k', '--key', required=True, help="output path for private key with PEM encoding")
 
     p = subparser.add_parser('ca', help='generate root key and cert')
     p.add_argument('-n', '--dn', required=True)
@@ -19,10 +20,11 @@ def main():
 
     p = subparser.add_parser('cert', help='generate key and cert')
     p.add_argument('-n', '--dn', required=True)
+    p.add_argument('-k', '--key', required=True, help="private key with PEM encoding. if missing will generate a key file in this location")
+    p.add_argument('-c', '--cert', required=True, help="certificate file path")
+    p.add_argument('-K', '--ca-key', required=True, help="CA private key path. If missing it will look for a key file in the same diretory as --ca-cert")
+    p.add_argument('-C', '--ca-cert', required=True, help="CA certificate file path. If missing will generate a self-signed-certificate")
     p.add_argument('-s', '--san', nargs='*', default=[], help="list of SAN in the form DNS:<FQDN> and IP:<IPV4 ADDRESS>")
-    p.add_argument('-k', '--key', nargs='?', help="private key with PEM encoding. if missing will generate a key")
-    p.add_argument('-C', '--ca-cert', nargs='?', help="CA certificate file path. If missing will generate a self-signed-certificate")
-    p.add_argument('-K', '--ca-key', nargs='?', help="CA private key path. If missing it will look for a key file in the same diretory as --ca-cert")
 
     args = parser.parse_args()
     # print(args.command, args.san)

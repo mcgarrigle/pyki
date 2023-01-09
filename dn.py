@@ -9,7 +9,9 @@ class DN:
         "DC":  NameOID.DOMAIN_COMPONENT,
         "C":   NameOID.COUNTRY_NAME,
         "L":   NameOID.LOCALITY_NAME,
+        "S":   NameOID.STATE_OR_PROVINCE_NAME,
         "UID": NameOID.USER_ID,
+        "O":   NameOID.ORGANIZATION_NAME,
         "OU":  NameOID.ORGANIZATIONAL_UNIT_NAME
     }
 
@@ -23,9 +25,6 @@ class DN:
     def attribute(self, pair):
         (name, value) = pair
         return x509.NameAttribute(DN.mapping[name], value)
-
-    def oid(self):
-        return self.name
 
     def __str__(self):
         return self.name.rfc4514_string()
