@@ -1,5 +1,6 @@
 
 from cryptography import x509
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
@@ -12,7 +13,6 @@ san = x509.SubjectAlternativeName(
     )
 
 print(san)
-exit(0)
 
 one_day = datetime.timedelta(1, 0, 0)
 private_key = rsa.generate_private_key(
@@ -33,12 +33,7 @@ builder = builder.not_valid_before(datetime.datetime.today() - one_day)
 builder = builder.not_valid_after(datetime.datetime.today() + (one_day * 30))
 builder = builder.serial_number(x509.random_serial_number())
 builder = builder.public_key(public_key)
-builder = builder.add_extension(
-    x509.SubjectAlternativeName(
-        [x509.DNSName(u'cryptography.io')]
-    ),
-    critical=False
-)
+builder = builder.add_extension(san, critical=False)
 builder = builder.add_extension(
     x509.BasicConstraints(ca=False, path_length=None), critical=True,
 )
@@ -46,4 +41,5 @@ certificate = builder.sign(
     private_key=private_key, algorithm=hashes.SHA256(),
 )
 print(isinstance(certificate, x509.Certificate))
-
+pem = certificate.public_bytes(encoding=serialization.Encoding.PEM).decode("utf-8")
+print(pem)

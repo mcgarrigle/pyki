@@ -33,8 +33,8 @@ class Certificate:
         builder = builder.not_valid_before(datetime.datetime.today() - one_day)
         builder = builder.not_valid_after(datetime.datetime.today() + (one_day * 30))
         builder = builder.serial_number(x509.random_serial_number())
-        for extension in extensions:
-            builder = builder.add_extension(extension, critical=True)
+        for (extension, criticality) in extensions:
+            builder = builder.add_extension(extension, critical=criticality)
         new = Certificate()
         new.builder = builder
         return new
