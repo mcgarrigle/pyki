@@ -15,7 +15,7 @@ class Command:
             private_key.save(path)
         return private_key
 
-    def usage(self, **kwargs):
+    def key_usage(self, **kwargs):
         defaults = {
             "digital_signature": False,
             "content_commitment": False,
@@ -42,10 +42,9 @@ class Command:
     #           CA:TRUE
 
     def ca(self,args):
-        print(args)
         ca_key = self.new_key(args.ca_key)
         basic = x509.BasicConstraints(ca=True, path_length=None) 
-        usage = self.usage(digital_signature=True, key_cert_sign=True, crl_sign=True)
+        usage = self.key_usage(digital_signature=True, key_cert_sign=True, crl_sign=True)
         extensions = [ (basic, True) , (usage, True) ]
         cert = Certificate.create(args.dn, ca_key, extensions)
         cert.sign(args.dn, ca_key)
@@ -61,15 +60,14 @@ class Command:
      #     CA:FALSE
 
     def cert(self,args):
-        print(args)
         san = SAN(args.san)
         ca_key = self.new_key(args.ca_key)
         ca_cert = Certificate.load(args.ca_cert)
         key = self.new_key(args.key)
         basic = x509.BasicConstraints(ca=False, path_length=None) 
-        usage = self.usage(digital_signature=True, key_encipherment=True)
+        usage = self.key_usage(digital_signature=True, key_encipherment=True)
         usages = x509.ExtendedKeyUsage([ x509.oid.ExtendedKeyUsageOID.SERVER_AUTH, x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH ])
-        extensions = [ (basic, True), (usage, True), (usages, False), (san.value, False) ]
+        extensions = [ (basic, False), (usage, True), (usages, False), (san.value, False) ]
         cert = Certificate.create(args.dn, key, extensions)
         cert.sign(ca_cert.cert.issuer.rfc4514_string(), ca_key)
         cert.save(args.cert)
