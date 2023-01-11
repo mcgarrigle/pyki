@@ -27,7 +27,6 @@ def main():
     p.add_argument('-s', '--san', nargs='*', default=[], help="list of SAN in the form DNS:<FQDN> and IP:<IPV4 ADDRESS>")
 
     args = parser.parse_args()
-    # print(args.command, args.san)
 
     c = Command()
     c.run(args)

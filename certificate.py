@@ -46,6 +46,14 @@ class Certificate:
            algorithm=hashes.SHA256(),
         )
 
+    @property
+    def issuer(self):
+        return self.cert.issuer.rfc4514_string()
+
+    @property
+    def subject(self):
+        return self.cert.subject.rfc4514_string()
+
     def pem(self):
        return self.cert.public_bytes(encoding=serialization.Encoding.PEM).decode("utf-8")
 
