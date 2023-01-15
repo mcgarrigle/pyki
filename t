@@ -8,8 +8,16 @@ cert() {
 
 rm -f *.key *.crt
 
-./pyki ca --dn 'O=MAC, CN=CA' --ca-cert ca.crt --ca-key ca.key
-./pyki cert --dn 'CN=X' --cert x.crt --key x.key --ca-cert ca.crt --ca-key ca.key --san 'DNS:x.com' 'DNS:y.com' 'IP:192.168.0.1'
+./pyki ca --dn 'C=UK, S=Wales, O=Mac, CN=CA' \
+  --ca-cert ca.crt \
+  --ca-key  ca.key
+
+./pyki cert --dn 'C=UK, S=Wales, O=Mac, CN=www' \
+  --cert x.crt \
+  --key  x.key \
+  --ca-cert ca.crt \
+  --ca-key  ca.key \
+  --san 'DNS:mac.wales' 'DNS:www.mac.wales' 'IP:192.168.0.1'
 
 cert ca.crt
 cert x.crt

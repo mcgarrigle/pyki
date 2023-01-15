@@ -1,8 +1,6 @@
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
-from cryptography.x509.oid import NameOID
 import datetime
 import ipaddress
 
@@ -35,8 +33,6 @@ class Certificate:
         new = Certificate()
         new.builder = builder
         return new
-
-    # TODO - add expiry
 
     def sign(self, issuer, ca_private_key, expires=365):
         self.builder = self.builder.issuer_name(DN(issuer).name)

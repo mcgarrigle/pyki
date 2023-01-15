@@ -10,12 +10,14 @@ class DN:
         "C":   NameOID.COUNTRY_NAME,
         "L":   NameOID.LOCALITY_NAME,
         "S":   NameOID.STATE_OR_PROVINCE_NAME,
+        "ST":  NameOID.STATE_OR_PROVINCE_NAME,
         "UID": NameOID.USER_ID,
         "O":   NameOID.ORGANIZATION_NAME,
         "OU":  NameOID.ORGANIZATIONAL_UNIT_NAME
     }
 
     def __init__(self, dn):
+        print(dn)
         attributes = [ self.attribute(self.chop(s, "=")) for s in self.chop(dn, ",") ]
         self.name = x509.Name(attributes)
 
@@ -24,7 +26,12 @@ class DN:
 
     def attribute(self, pair):
         (name, value) = pair
-        return x509.NameAttribute(DN.mapping[name], value)
+        print(name, value)
+        oid = DN.mapping[name]
+        print(oid)
+        if oid is None:
+            raise RuntimeError(f"DN attribute {name} not known")
+        return x509.NameAttribute(oid, value)
 
     def __str__(self):
         return self.name.rfc4514_string()
