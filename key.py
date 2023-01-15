@@ -1,3 +1,4 @@
+import os
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 
@@ -15,6 +16,15 @@ class Key:
             pem = bytearray(f.read(), "utf8")
             k = Key()
             k.key = serialization.load_pem_private_key(pem, password=None)
+        return k
+
+    @staticmethod
+    def new(path):
+        if os.path.isfile(path):
+            k = Key.load(path)
+        else:
+            k = Key.generate()
+            k.save(path)
         return k
 
     def save(self, path):

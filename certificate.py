@@ -25,13 +25,10 @@ class Certificate:
 
     @staticmethod
     def create(subject, private_key, extensions):
-        one_day = datetime.timedelta(1, 0, 0)
         public_key = private_key.public()
         builder = x509.CertificateBuilder()
         builder = builder.subject_name(DN(subject).name)
         builder = builder.public_key(public_key)
-        builder = builder.not_valid_before(datetime.datetime.today() - one_day)
-        builder = builder.not_valid_after(datetime.datetime.today() + (one_day * 30))
         builder = builder.serial_number(x509.random_serial_number())
         for (extension, criticality) in extensions:
             builder = builder.add_extension(extension, critical=criticality)
@@ -39,8 +36,13 @@ class Certificate:
         new.builder = builder
         return new
 
-    def sign(self, issuer, ca_private_key):
+    # TODO - add expiry
+
+    def sign(self, issuer, ca_private_key, expires=365):
         self.builder = self.builder.issuer_name(DN(issuer).name)
+        one_day = datetime.timedelta(1, 0, 0)
+        self.builder = self.builder.not_valid_before(datetime.datetime.today() - one_day)
+        self.builder = self.builder.not_valid_after(datetime.datetime.today() + (one_day * expires))
         self.cert = self.builder.sign(
            private_key=ca_private_key.private(),
            algorithm=hashes.SHA256(),
