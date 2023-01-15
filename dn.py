@@ -17,7 +17,6 @@ class DN:
     }
 
     def __init__(self, dn):
-        print(dn)
         attributes = [ self.attribute(self.chop(s, "=")) for s in self.chop(dn, ",") ]
         self.name = x509.Name(attributes)
 
@@ -26,9 +25,7 @@ class DN:
 
     def attribute(self, pair):
         (name, value) = pair
-        print(name, value)
         oid = DN.mapping[name]
-        print(oid)
         if oid is None:
             raise RuntimeError(f"DN attribute {name} not known")
         return x509.NameAttribute(oid, value)
