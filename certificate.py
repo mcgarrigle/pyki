@@ -9,12 +9,18 @@ from san import SAN
 
 class Certificate:
 
+
+    @staticmethod
+    def x509_load(path):
+        with open(path) as f:
+            pem = bytearray(f.read(), "utf8")
+            cert = x509.load_pem_x509_certificate(pem)
+        return cert
+
     @staticmethod
     def load(path):
         new = Certificate()
-        with open(path) as f:
-            pem = bytearray(f.read(), "utf8")
-            new.cert = x509.load_pem_x509_certificate(pem)
+        new.cert = Certificate.x509_load(path)
         return new
 
     def save(self, path):

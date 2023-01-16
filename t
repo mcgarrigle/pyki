@@ -13,11 +13,20 @@ rm -f *.key *.crt
   --ca-key  ca.key
 
 ./pyki cert --dn 'C=UK, S=Wales, O=Mac, CN=www' \
-  --cert x.crt \
-  --key  x.key \
+  --cert www.crt \
+  --key  www.key \
   --ca-cert ca.crt \
   --ca-key  ca.key \
   --san 'DNS:mac.wales' 'DNS:www.mac.wales' 'IP:192.168.0.1'
 
+./pyki pkcs12 --key www.key --cert www.crt \
+  --ca-certs ca.crt \
+  -s www.p12 \
+  --password inc0rrect
+
 cert ca.crt
-cert x.crt
+cert www.crt
+
+echo
+echo "--- keystore www.p12 --------------"
+openssl pkcs12 -nokeys -info -in www.p12 -passin pass:inc0rrect

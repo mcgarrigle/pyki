@@ -32,7 +32,3 @@ class DN:
 
     def __str__(self):
         return self.name.rfc4514_string()
-
-#dn = DN("CN =foo, OU= blue team ,DC = example , DC=org")
-#print(dn.oid())
-#print(dn)
