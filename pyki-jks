@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# usage:
+#
+# pyki-jks KEYSTORE PASSPHRASE KEY CERT CA1 CA2 ...
+#
+# pyki-jks www.jks inc0rrect www.key www.crt ca.crt
+
+KEYSTORE="$1"
+PASSPHRASE="$2"
+KEY="$3"
+CERT="$4"
+shift 4
+OTHERS="$@"
+
+rm -f "${KEYSTORE}"
+
+KS=$(mktemp /tmp/XXXXXXXXXXX)
+
+openssl pkcs12 -export \
+  -password "pass:${PASSPHRASE}" \
+  -inkey "${KEY}" \
+  -in    "${CERT}" \
+  -name "server" \
+  -out "${KS}"
+
+keytool -importkeystore \
+  -srckeystore "${KS}" -srcstoretype PKCS12 \
+  -srcstorepass "${PASSPHRASE}" \
+  -destkeystore "${KEYSTORE}" -deststoretype JKS \
+  -deststorepass "${PASSPHRASE}" 
+
+keytool -import \
+  -file ca.crt \
+  -alias ca1 \
+  -keystore "www.jks" \
+  -storepass "${PASSPHRASE}" \
+  -noprompt
+
+rm -f "${KS}"
+
+echo
+echo '--------------------------------'
+
+keytool -list -keystore "${KEYSTORE}" -storepass "${PASSPHRASE}"

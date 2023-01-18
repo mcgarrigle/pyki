@@ -3,3 +3,4 @@ __pycache__
 *.key
 *.crt
 *.p12
+*.jks

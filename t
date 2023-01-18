@@ -30,3 +30,6 @@ cert www.crt
 echo
 echo "--- keystore www.p12 --------------"
 openssl pkcs12 -nokeys -info -in www.p12 -passin pass:inc0rrect
+
+echo
+keytool -list -keystore www.p12 -storepass inc0rrect
