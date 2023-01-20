@@ -1,24 +1,40 @@
-#!/bin/sh
+#!/bin/bash
 
 # usage:
 #
-# pyki-jks KEYSTORE PASSPHRASE KEY CERT CA1 CA2 ...
+# pyki-jks  --keystore KEYSTORE --password PASSWORD --key KEY --cert CERT CA1 CA2 ...
 #
-# pyki-jks www.jks inc0rrect www.key www.crt ca.crt
+# --keystore www.jks --password inc0rrect --key www.key --cert www.crt ca.crt
 
-KEYSTORE="$1"
-PASSPHRASE="$2"
-KEY="$3"
-CERT="$4"
-shift 4
-OTHERS="$@"
+echo "'$@'"
+
+ARGS=$(getopt -a -n pyki-jks -o K:p:k:c: --long keystore:,password:,key:,cert: -- "$@")
+
+ERROR=$?
+if [ $ERROR != 0 ]; then 
+    echo "Incorrect options provided"
+    exit 1
+fi
+
+eval set -- "$ARGS"
+while :
+do
+  case "$1" in
+    --keystore) KEYSTORE="$2"; shift 2 ;;
+    --password) PASSWORD="$2"; shift 2 ;;
+    --key)      KEY="$2";      shift 2 ;;
+    --cert)     CERT="$2";     shift 2 ;;
+    --) shift; break ;;
+    *) echo "Unexpected option: $1"; exit 1
+  esac
+done
 
 rm -f "${KEYSTORE}"
 
 KS=$(mktemp /tmp/XXXXXXXXXXX)
 
 openssl pkcs12 -export \
-  -password "pass:${PASSPHRASE}" \
+  -password "pass:${PASSWORD}" \
   -inkey "${KEY}" \
   -in    "${CERT}" \
   -name "server" \
@@ -26,15 +42,15 @@ openssl pkcs12 -export \
 
 keytool -importkeystore \
   -srckeystore "${KS}" -srcstoretype PKCS12 \
-  -srcstorepass "${PASSPHRASE}" \
+  -srcstorepass "${PASSWORD}" \
   -destkeystore "${KEYSTORE}" -deststoretype JKS \
-  -deststorepass "${PASSPHRASE}" 
+  -deststorepass "${PASSWORD}" 
 
 keytool -import \
   -file ca.crt \
   -alias ca1 \
   -keystore "www.jks" \
-  -storepass "${PASSPHRASE}" \
+  -storepass "${PASSWORD}" \
   -noprompt
 
 rm -f "${KS}"
@@ -42,4 +58,4 @@ rm -f "${KS}"
 echo
 echo '--------------------------------'
 
-keytool -list -keystore "${KEYSTORE}" -storepass "${PASSPHRASE}"
+keytool -list -keystore "${KEYSTORE}" -storepass "${PASSWORD}"
