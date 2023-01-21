@@ -24,7 +24,7 @@ do
     --password) PASSWORD="$2"; shift 2 ;;
     --key)      KEY="$2";      shift 2 ;;
     --cert)     CERT="$2";     shift 2 ;;
-    --) shift; break ;;
+    --)         shift; break ;;
     *) echo "Unexpected option: $1"; exit 1
   esac
 done
@@ -46,12 +46,17 @@ keytool -importkeystore \
   -destkeystore "${KEYSTORE}" -deststoretype JKS \
   -deststorepass "${PASSWORD}" 
 
-keytool -import \
-  -file ca.crt \
-  -alias ca1 \
-  -keystore "www.jks" \
-  -storepass "${PASSWORD}" \
-  -noprompt
+N=1
+for CA in $@; do
+  keytool -import \
+    -file "$CA" \
+    -alias "ca$N" \
+    -keystore "www.jks" \
+    -storepass "${PASSWORD}" \
+    -noprompt
+
+    (( N = N + 1 ))
+done
 
 rm -f "${KS}"
 
