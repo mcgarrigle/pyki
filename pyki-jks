@@ -18,7 +18,7 @@ EOF
 
 require() {
   S=$(eval "echo \$$1")
-  if [ -z "$S" ]; then
+  if [ -z "${S}" ]; then
     echo "Parameter --${1,,} missing"
     usage
   fi
@@ -26,13 +26,13 @@ require() {
 
 ARGS=$(getopt -a -n pyki-jks -o K:p:k:c: --long keystore:,password:,key:,cert: -- "$@")
 
-ERROR=$?
-if [ $ERROR != 0 ]; then 
+ERROR="$?"
+if [ "${ERROR}" != "0" ]; then 
     usage
     exit 1
 fi
 
-eval set -- "$ARGS"
+eval set -- "${ARGS}"
 while :
 do
   case "$1" in
@@ -48,11 +48,11 @@ done
 require KEYSTORE
 require PASSWORD
 
-if [ -n "$KEY" ]; then
+if [ -n "${KEY}" ]; then
   require CERT
 fi
 
-if [ -n "$CERT" ]; then
+if [ -n "${CERT}" ]; then
   require KEY
 fi
 
