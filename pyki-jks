@@ -29,7 +29,6 @@ ARGS=$(getopt -a -n pyki-jks -o K:p:k:c: --long keystore:,password:,key:,cert: -
 ERROR="$?"
 if [ "${ERROR}" != "0" ]; then 
     usage
-    exit 1
 fi
 
 eval set -- "${ARGS}"
