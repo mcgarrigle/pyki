@@ -79,7 +79,7 @@ for CA in $@; do
   keytool -import \
     -file "$CA" \
     -alias "ca$N" \
-    -keystore "www.jks" \
+    -keystore "${KEYSTORE}" \
     -storepass "${PASSWORD}" \
     -noprompt
 
