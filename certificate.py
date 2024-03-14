@@ -12,8 +12,8 @@ class Certificate:
 
     @staticmethod
     def x509_load(path):
-        with open(path) as f:
-            pem = bytearray(f.read(), "utf8")
+        with open(path, 'rb') as f:
+            pem  = f.read()
             cert = x509.load_pem_x509_certificate(pem)
         return cert
 
