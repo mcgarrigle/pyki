@@ -2,6 +2,14 @@
 
 
 ```
- ./pyki ca --dn 'O=MAC, CN=CA' --ca-cert ca.crt --ca-key ca.key
- ./pyki cert --dn 'CN=X' --cert x.crt --key x.key --ca-cert ca.crt --ca-key ca.key --san 'DNS:x.com' 'DNS:y.com'
+./pyki ca --dn 'O=MAC, CN=CA' \
+  --ca-cert secrets/ca.crt \
+  --ca-key secrets/ca.key
+
+./pyki cert --dn 'CN=X' \
+  --cert secrets/x.crt \
+  --key secrets/x.key \
+  --ca-cert secrets/ca.crt \
+  --ca-key secrets/ca.key \
+  --san 'IP:10.0.0.1' 'DNS:x.com' 'DNS:y.com'
 ```
