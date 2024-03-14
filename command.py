@@ -96,7 +96,6 @@ class Command:
         cert = Certificate.load(args.cert)
         password = args.password.encode('utf-8')
         ca_certs = [ Certificate.x509_load(c) for c in args.ca_certs ]
-        print(ca_certs)
         p12 = pkcs12.serialize_key_and_certificates(b'store', key.private(), cert.cert, ca_certs,  BestAvailableEncryption(password))
         with open(args.keystore, "wb") as f:
             f.write(p12)
