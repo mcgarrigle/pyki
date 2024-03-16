@@ -7,7 +7,7 @@ class SAN:
         self.san = san
 
     def item(self, name):
-        (label, subject) = name.split(":")
+        (label, subject) = name.split(":", 1)
         if label == "DNS":
             return x509.DNSName(subject)
         if label == "IP":
