@@ -1,15 +1,47 @@
 #!/usr/bin/env python3
 
-import os
-import sys
+import click
 
 from command import Command
 
-def main():
-    c = Command()
-    parser = c.create_parser()
-    args = parser.parse_args()
-    c.run(args)
+comm = Command()
 
-if __name__ == "__main__":
-    main()
+@click.group()
+def cli():
+    pass
+
+@cli.command()
+@click.option('-k', '--key', required=True, help="output path for private key with PEM encoding")
+def key(key):
+    comm.key(key)
+
+@cli.command()
+@click.option('-n', '--dn', required=True)
+@click.option('-K', '--ca-key', required=False, help="CA private key path. If missing it will will generate a key")
+@click.option('-C', '--ca-cert', required=True, help="CA certificate file path")
+@click.option('-e', '--expires', type=int, default=3650, help="expiry in days")
+def ca(dn, ca_key, ca_cert, expires):
+    comm.ca(dn, ca_key, ca_cert, expires)
+
+@cli.command()
+@click.option('-n', '--dn', required=True)
+@click.option('-k', '--key', required=True, help="private key with PEM encoding. if missing will generate a key file in this location")
+@click.option('-c', '--cert', required=True, help="certificate file path")
+@click.option('-K', '--ca-key', required=True, help="CA private key path. If missing it will look for a key file in the same diretory as --ca-cert")
+@click.option('-C', '--ca-cert', required=True, help="CA certificate file path. If missing will generate a self-signed-certificate")
+@click.option('-s','--san', multiple=True, help="SAN in the form DNS:<FQDN> or IP:<IPV4 ADDRESS>")
+@click.option('-e', '--expires', type=int, default=3650, help="expiry in days")
+def cert(dn, key, cert, ca_key, ca_cert, san, expires):
+    comm.cert(dn, key, cert, ca_key, ca_cert, san, expires)
+
+@cli.command()
+@click.option('-s','--keystore', required=True, help="keystore file parth")
+@click.option('-k', '--key', required=True, help="private key with PEM encoding. if missing will generate a key file in this location")
+@click.option('-c', '--cert', required=True, help="certificate file path")
+@click.option('-C', '--ca-cert', multiple=True, help="CA certificate file path")
+@click.option('-p', '--password', type=str, default='changeit', help='password for keystore (default is "changeit")')
+def pkcs12(keystore, key, cert, ca_cert, password):
+    comm.pkcs12(keystore, key, cert, ca_cert, password)
+
+if __name__ == '__main__':
+    cli()

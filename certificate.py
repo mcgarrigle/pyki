@@ -9,7 +9,6 @@ from san import SAN
 
 class Certificate:
 
-
     @staticmethod
     def x509_load(path):
         with open(path, 'rb') as f:

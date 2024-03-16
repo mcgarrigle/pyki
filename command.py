@@ -57,49 +57,39 @@ class Command:
         args.update(kwargs)
         return x509.KeyUsage(**args)
       
-    def key(self, args):
-        Key.generate().save(args.key)
+    def key(self, key_arg):
+        Key.generate().save(key_arg)
 
-    # Namespace(command='ca', dn='ss', ca_cert='c', ca_key=None)
-
-    def ca(self, args):
-        ca_key = Key.new(args.ca_key)
+    def ca(self, dn, ca_key_path, ca_cert_path, expires):
+        ca_key = Key.new(ca_key_path)
         basic = x509.BasicConstraints(ca=True, path_length=None) 
         usage = self.key_usage(digital_signature=True, key_cert_sign=True, crl_sign=True)
         extensions = [ (basic, True) , (usage, True) ]
-        cert = Certificate.create(args.dn, ca_key, extensions)
-        cert.sign(args.dn, ca_key, args.expires)
-        cert.save(args.ca_cert)
+        cert = Certificate.create(dn, ca_key, extensions)
+        cert.sign(dn, ca_key, expires)
+        cert.save(ca_cert_path)
 
-    # Namespace(command='cert', dn='CN=X', key='www.key', cert='www.crt', ca_key='ca.key', ca_cert='ca.crt', san=[])
-
-    def cert(self, args):
-        ca_key = Key.load(args.ca_key)
-        ca_cert = Certificate.load(args.ca_cert)
-        key = Key.new(args.key)
+    def cert(self, dn, key_path, cert_path, ca_key_path, ca_cert_path, san_list, expires):
+        key = Key.new(key_path)
+        ca_key = Key.load(ca_key_path)
+        ca_cert = Certificate.load(ca_cert_path)
         basic = x509.BasicConstraints(ca=False, path_length=None) 
         usage = self.key_usage(digital_signature=True, key_encipherment=True)
         usages = x509.ExtendedKeyUsage([ x509.oid.ExtendedKeyUsageOID.SERVER_AUTH, x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH ])
-        if args.san:
-            san = SAN(args.san)
+        if san_list:
+            san = SAN(san_list)
             extensions = [ (basic, False), (usage, True), (usages, False), (san.value, False) ]
         else:
             extensions = [ (basic, False), (usage, True), (usages, False) ]
-        cert = Certificate.create(args.dn, key, extensions)
-        cert.sign(ca_cert.issuer, ca_key, args.expires)
-        cert.save(args.cert)
+        cert = Certificate.create(dn, key, extensions)
+        cert.sign(ca_cert.issuer, ca_key, expires)
+        cert.save(cert_path)
 
-    # Namespace(command='pkcs12', keystore='www.p12', key='www.key', cert='www.crt', ca_certs=['ca.crt'], password='inc0rrect')
-
-    def pkcs12(self, args):
-        key = Key.load(args.key)
-        cert = Certificate.load(args.cert)
-        password = args.password.encode('utf-8')
-        ca_certs = [ Certificate.x509_load(c) for c in args.ca_certs ]
+    def pkcs12(self, keystore_path, key_path, cert_path, ca_certs, password):
+        key = Key.load(key_path)
+        cert = Certificate.load(cert_path)
+        password = password.encode('utf-8')
+        ca_certs = [ Certificate.x509_load(c) for c in ca_certs ]
         p12 = pkcs12.serialize_key_and_certificates(b'store', key.private(), cert.cert, ca_certs,  BestAvailableEncryption(password))
-        with open(args.keystore, "wb") as f:
+        with open(keystore_path, "wb") as f:
             f.write(p12)
-
-    def run(self, args):
-        fn = eval(f"self.{args.command}")
-        fn(args)

@@ -6,7 +6,7 @@ cert() {
   openssl x509 -noout -issuer -subject -ext basicConstraints,keyUsage,extendedKeyUsage,subjectAltName -in $1
 }
 
-rm -f *.key *.crt
+rm -f secrets/*.{key,crt,p12}
 
 ./pyki ca \
   --dn 'C=UK, S=Wales, O=Mac, CN=CA' \
@@ -19,14 +19,16 @@ rm -f *.key *.crt
   --ca-key  secrets/ca.key \
   --cert secrets/www.crt \
   --key  secrets/www.key \
-  --san 'DNS:mac.wales' 'DNS:www.mac.wales' 'IP:192.168.0.1'
+  --san 'DNS:mac.wales' \
+  --san 'DNS:www.mac.wales' \
+  --san 'IP:192.168.0.1'
 
 ./pyki pkcs12 \
+  --keystore secrets/www.p12 \
+  --password inc0rrect \
   --key secrets/www.key \
   --cert secrets/www.crt \
-  --ca-certs secrets/ca.crt \
-  -s secrets/www.p12 \
-  --password inc0rrect
+  --ca-cert secrets/ca.crt 
 
 cert secrets/ca.crt
 cert secrets/www.crt
