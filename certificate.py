@@ -23,7 +23,7 @@ class Certificate:
 
     @staticmethod
     def load(path):
-        new = Certificate('CN=void','',[])
+        new = Certificate(None, None, None)
         new.cert = Certificate.x509_load(path)
         return new
 
