@@ -19,11 +19,11 @@ class Key:
         return k
 
     @staticmethod
-    def new(path):
+    def new(path, key_size = 2048):
         if os.path.isfile(path):
             k = Key.load(path)
         else:
-            k = Key.generate()
+            k = Key.generate(key_size)
             k.save(path)
         return k
 

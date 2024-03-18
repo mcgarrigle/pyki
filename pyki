@@ -12,16 +12,18 @@ def cli():
 
 @cli.command()
 @click.option('-k', '--key', required=True, help="output path for private key with PEM encoding")
-def key(key):
-    comm.key(key)
+@click.option('-s', '--key-size', type=int, default=4096, help="key size in bits")
+def key(key, key_size):
+    comm.key(key, key_size)
 
 @cli.command()
 @click.option('-n', '--dn', required=True)
 @click.option('-K', '--ca-key', required=False, help="CA private key path. If missing it will will generate a key")
 @click.option('-C', '--ca-cert', required=True, help="CA certificate file path")
 @click.option('-e', '--expires', type=int, default=3650, help="expiry in days")
-def ca(dn, ca_key, ca_cert, expires):
-    comm.ca(dn, ca_key, ca_cert, expires)
+@click.option('-s', '--key-size', type=int, default=4096, help="key size in bits")
+def ca(dn, ca_key, ca_cert, expires, key_size):
+    comm.ca(dn, ca_key, ca_cert, expires, key_size)
 
 @cli.command()
 @click.option('-n', '--dn', required=True)
@@ -31,8 +33,9 @@ def ca(dn, ca_key, ca_cert, expires):
 @click.option('-C', '--ca-cert', required=True, help="CA certificate file path. If missing will generate a self-signed-certificate")
 @click.option('-s','--san', multiple=True, help="SAN in the form DNS:<FQDN> or IP:<IPV4 ADDRESS>")
 @click.option('-e', '--expires', type=int, default=3650, help="expiry in days")
-def cert(dn, key, cert, ca_key, ca_cert, san, expires):
-    comm.cert(dn, key, cert, ca_key, ca_cert, san, expires)
+@click.option('-s', '--key-size', type=int, default=2048, help="key size in bits")
+def cert(dn, key, cert, ca_key, ca_cert, san, expires, key_size):
+    comm.cert(dn, key, cert, ca_key, ca_cert, san, expires, key_size)
 
 @cli.command()
 @click.option('-s','--keystore', required=True, help="keystore file parth")

@@ -25,11 +25,11 @@ class Command:
         args.update(kwargs)
         return x509.KeyUsage(**args)
       
-    def key(self, key_arg):
-        Key.generate().save(key_arg)
+    def key(self, key_path, key_size):
+        Key.generate(key_size).save(key_path)
 
-    def ca(self, dn, ca_key_path, ca_cert_path, expires):
-        ca_key     = Key.new(ca_key_path)
+    def ca(self, dn, ca_key_path, ca_cert_path, expires, key_size):
+        ca_key     = Key.new(ca_key_path, key_size)
         basic      = x509.BasicConstraints(ca=True, path_length=None) 
         usage      = self.key_usage(key_cert_sign=True, crl_sign=True)
         extensions = [ (basic, True) , (usage, True) ]
@@ -37,8 +37,8 @@ class Command:
         cert.sign(dn, ca_key, expires)
         cert.save(ca_cert_path)
 
-    def cert(self, dn, key_path, cert_path, ca_key_path, ca_cert_path, san_list, expires):
-        key        = Key.new(key_path)
+    def cert(self, dn, key_path, cert_path, ca_key_path, ca_cert_path, san_list, expires, key_size):
+        key        = Key.new(key_path, key_size)
         ca_key     = Key.load(ca_key_path)
         ca_cert    = Certificate.load(ca_cert_path)
         basic      = x509.BasicConstraints(ca=False, path_length=None) 
