@@ -33,6 +33,7 @@ class Command:
         basic      = x509.BasicConstraints(ca=True, path_length=None) 
         usage      = self.key_usage(key_cert_sign=True, crl_sign=True)
         extensions = [ (basic, True) , (usage, True) ]
+        # extensions = [ (basic, True) ]
         cert = Certificate(dn, ca_key, extensions)
         cert.sign(dn, ca_key, expires)
         cert.save(ca_cert_path)

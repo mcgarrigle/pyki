@@ -14,6 +14,16 @@ class Certificate:
         self.key         = key
         self.extensions  = extensions
 
+    def attribute(self, a):
+        name = a.rfc4514_attribute_name
+        value = a.value
+        return f"{name} = {value}"
+
+    def fdn(self, dn):
+        attributes = [ self.attribute(a) for a in dn ]
+        name = ", ".join(attributes)
+        return name
+
     @staticmethod
     def x509_load(path):
         with open(path, 'rb') as f:
@@ -50,11 +60,11 @@ class Certificate:
 
     @property
     def issuer(self):
-        return self.cert.issuer.rfc4514_string()
+        return self.fdn(self.cert.issuer)
 
     @property
     def subject(self):
-        return self.cert.subject.rfc4514_string()
+        return self.fdn(self.cert.subject)
 
     def pem(self):
        return self.cert.public_bytes(encoding=serialization.Encoding.PEM).decode("utf-8")

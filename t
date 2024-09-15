@@ -1,14 +1,17 @@
 #!/bin/bash -e
 
-key() {
+header() {
   echo
-  echo "--- key $1 --------------"
+  echo "--- $1 --------------"
+}
+
+key() {
+  header "key $1"
   openssl rsa -in $1 -text -noout |grep Private
 }
 
 cert() {
-  echo
-  echo "--- certificate $1 --------------"
+  header "certificate $1"
   openssl x509 -noout -issuer -subject -ext basicConstraints,keyUsage,extendedKeyUsage,subjectAltName -in $1
 }
 
@@ -42,8 +45,12 @@ key secrets/www.key
 cert secrets/ca.crt
 cert secrets/www.crt
 
+header "verify www.crt"
+openssl verify -verbose -CAfile secrets/ca.crt secrets/www.crt
+exit
+
 echo
-echo "--- keystore www.p12 --------------"
+header "keystore www.p12"
 openssl pkcs12 -nokeys -info -noout -in secrets/www.p12 -passin pass:inc0rrect
 
 echo
