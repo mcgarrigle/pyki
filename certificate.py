@@ -9,20 +9,12 @@ from san import SAN
 
 class Certificate:
 
+    one_day = datetime.timedelta(1, 0, 0)
+
     def __init__(self, dn, key, extensions):
         self.dn          = dn
         self.key         = key
         self.extensions  = extensions
-
-    def attribute(self, a):
-        name = a.rfc4514_attribute_name
-        value = a.value
-        return f"{name} = {value}"
-
-    def fdn(self, dn):
-        attributes = [ self.attribute(a) for a in dn ]
-        name = ", ".join(attributes)
-        return name
 
     @staticmethod
     def x509_load(path):
@@ -42,15 +34,16 @@ class Certificate:
             f.write(self.pem())
 
     def sign(self, issuer, ca_private_key, expires=365):
-        one_day = datetime.timedelta(1, 0, 0)
+        issuer_x509_name  = DN(issuer).name
+        subject_x509_name = DN(self.dn).name
         builder = x509.CertificateBuilder()
         builder = builder \
-            .subject_name(DN(self.dn).name) \
+            .subject_name(subject_x509_name) \
+            .issuer_name(issuer_x509_name) \
             .public_key(self.key.public()) \
             .serial_number(x509.random_serial_number()) \
-            .issuer_name(DN(issuer).name) \
-            .not_valid_before(datetime.datetime.today() - one_day) \
-            .not_valid_after(datetime.datetime.today() + (one_day * expires))
+            .not_valid_before(datetime.datetime.today()) \
+            .not_valid_after(datetime.datetime.today() + (self.one_day * expires))
         for (extension, criticality) in self.extensions:
             builder = builder.add_extension(extension, critical=criticality)
         self.cert = builder.sign(
@@ -60,11 +53,11 @@ class Certificate:
 
     @property
     def issuer(self):
-        return self.fdn(self.cert.issuer)
+        return str(DN(self.cert.issuer))
 
     @property
     def subject(self):
-        return self.fdn(self.cert.subject)
+        return str(DN(self.cert.subject))
 
     def pem(self):
        return self.cert.public_bytes(encoding=serialization.Encoding.PEM).decode("utf-8")

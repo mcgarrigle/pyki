@@ -16,8 +16,11 @@ class DN:
     }
 
     def __init__(self, dn):
-        attributes = [ self.attribute(self.chop(s, "=")) for s in self.chop(dn, ",") ]
-        self.name = x509.Name(attributes)
+        if type(dn) == x509.Name:
+            self.name = dn
+        else:
+            attributes = [ self.attribute(self.chop(s, "=")) for s in self.chop(dn, ",") ]
+            self.name = x509.Name(attributes)
 
     def chop(self, s, c):
         return [ e.strip() for e in s.split(c) ]
@@ -29,5 +32,16 @@ class DN:
             raise RuntimeError(f"DN attribute {name} not known")
         return x509.NameAttribute(oid, value)
 
+    def attribute_string(self, a):
+        name = a.rfc4514_attribute_name
+        return f"{name} = {a.value}"
+
+    def to_string(self):
+        attributes = [ self.attribute_string(a) for a in self.name ]
+        return  ", ".join(attributes)
+
     def __str__(self):
-        return self.name.rfc4514_string()
+        return self.to_string()
+
+    def __repr__(self):
+        return 'DN<' + self.to_string() + '>'

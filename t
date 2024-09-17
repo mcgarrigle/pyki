@@ -12,7 +12,7 @@ key() {
 
 cert() {
   header "certificate $1"
-  openssl x509 -noout -issuer -subject -ext basicConstraints,keyUsage,extendedKeyUsage,subjectAltName -in $1
+  openssl x509 -noout -issuer -subject -ext basicConstraints,keyUsage,extendedKeyUsage,subjectAltName -startdate -enddate -in $1
 }
 
 rm -f secrets/*.{key,crt,p12}
@@ -22,6 +22,7 @@ rm -f secrets/*.{key,crt,p12}
   --ca-cert secrets/ca.crt \
   --ca-key  secrets/ca.key
 
+# python3 -m trace --trace ./pyki cert \
 ./pyki cert \
   --dn 'C=UK, S=Wales, O=Mac, CN=www' \
   --ca-cert secrets/ca.crt \
