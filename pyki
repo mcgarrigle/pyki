@@ -17,16 +17,16 @@ def key(key, key_size):
     comm.key(key, key_size)
 
 @cli.command()
-@click.option('-n', '--dn', required=True)
+@click.option('-n', '--subject', required=True)
 @click.option('-K', '--ca-key', required=False, help="CA private key path. If missing it will will generate a key")
 @click.option('-C', '--ca-cert', required=True, help="CA certificate file path")
 @click.option('-e', '--expires', type=int, default=3650, help="expiry in days")
 @click.option('-s', '--key-size', type=int, default=4096, help="key size in bits")
-def ca(dn, ca_key, ca_cert, expires, key_size):
-    comm.ca(dn, ca_key, ca_cert, expires, key_size)
+def ca(subject, ca_key, ca_cert, expires, key_size):
+    comm.ca(subject, ca_key, ca_cert, expires, key_size)
 
 @cli.command()
-@click.option('-n', '--dn', required=True)
+@click.option('-n', '--subject', required=True)
 @click.option('-k', '--key', required=True, help="private key with PEM encoding. if missing will generate a key file in this location")
 @click.option('-c', '--cert', required=True, help="certificate file path")
 @click.option('-K', '--ca-key', required=True, help="CA private key path. If missing it will look for a key file in the same diretory as --ca-cert")
@@ -34,8 +34,8 @@ def ca(dn, ca_key, ca_cert, expires, key_size):
 @click.option('-s','--san', multiple=True, help="SAN in the form DNS:<FQDN> or IP:<IPV4 ADDRESS>")
 @click.option('-e', '--expires', type=int, default=3650, help="expiry in days")
 @click.option('-s', '--key-size', type=int, default=2048, help="key size in bits")
-def cert(dn, key, cert, ca_key, ca_cert, san, expires, key_size):
-    comm.cert(dn, key, cert, ca_key, ca_cert, san, expires, key_size)
+def cert(subject, key, cert, ca_key, ca_cert, san, expires, key_size):
+    comm.cert(subject, key, cert, ca_key, ca_cert, san, expires, key_size)
 
 @cli.command()
 @click.option('-s','--keystore', required=True, help="keystore file parth")

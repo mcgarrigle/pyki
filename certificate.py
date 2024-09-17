@@ -11,8 +11,8 @@ class Certificate:
 
     one_day = datetime.timedelta(1, 0, 0)
 
-    def __init__(self, dn, key, extensions):
-        self.dn          = dn
+    def __init__(self, subject, key, extensions):
+        self.subject     = subject
         self.key         = key
         self.extensions  = extensions
 
@@ -35,7 +35,7 @@ class Certificate:
 
     def sign(self, issuer, ca_private_key, expires=365):
         issuer_x509_name  = DN(issuer).name
-        subject_x509_name = DN(self.dn).name
+        subject_x509_name = DN(self.subject).name
         builder = x509.CertificateBuilder()
         builder = builder \
             .subject_name(subject_x509_name) \
@@ -55,12 +55,12 @@ class Certificate:
     def issuer(self):
         return str(DN(self.cert.issuer))
 
-    @property
-    def subject(self):
-        return str(DN(self.cert.subject))
+    #@property
+    #def subject(self):
+    #    return str(DN(self.cert.subject))
 
     def pem(self):
        return self.cert.public_bytes(encoding=serialization.Encoding.PEM).decode("utf-8")
 
     def __repr__(self):
-      return repr(self.dn)
+      return repr(self.subject)

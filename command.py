@@ -28,17 +28,16 @@ class Command:
     def key(self, key_path, key_size):
         Key.generate(key_size).save(key_path)
 
-    def ca(self, dn, ca_key_path, ca_cert_path, expires, key_size):
+    def ca(self, subject, ca_key_path, ca_cert_path, expires, key_size):
         ca_key     = Key.new(ca_key_path, key_size)
         basic      = x509.BasicConstraints(ca=True, path_length=None) 
         usage      = self.key_usage(key_cert_sign=True, crl_sign=True)
         extensions = [ (basic, True) , (usage, True) ]
-        # extensions = [ (basic, True) ]
-        cert = Certificate(dn, ca_key, extensions)
-        cert.sign(dn, ca_key, expires)
+        cert = Certificate(subject, ca_key, extensions)
+        cert.sign(subject, ca_key, expires)
         cert.save(ca_cert_path)
 
-    def cert(self, dn, key_path, cert_path, ca_key_path, ca_cert_path, san_list, expires, key_size):
+    def cert(self, subject, key_path, cert_path, ca_key_path, ca_cert_path, san_list, expires, key_size):
         key        = Key.new(key_path, key_size)
         ca_key     = Key.load(ca_key_path)
         ca_cert    = Certificate.load(ca_cert_path)
@@ -49,7 +48,7 @@ class Command:
         if san_list:
             san = SAN(san_list)
             extensions.append((san.value, False))
-        cert = Certificate(dn, key, extensions)
+        cert = Certificate(subject, key, extensions)
         cert.sign(ca_cert.issuer, ca_key, expires)
         cert.save(cert_path)
 

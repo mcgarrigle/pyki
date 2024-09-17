@@ -18,13 +18,12 @@ cert() {
 rm -f secrets/*.{key,crt,p12}
 
 ./pyki ca \
-  --dn 'C=UK, S=Wales, O=Mac, CN=CA' \
+  --subject 'C=UK, S=Wales, O=Mac, CN=CA' \
   --ca-cert secrets/ca.crt \
   --ca-key  secrets/ca.key
 
-# python3 -m trace --trace ./pyki cert \
 ./pyki cert \
-  --dn 'C=UK, S=Wales, O=Mac, CN=www' \
+  --subject 'C=UK, S=Wales, O=Mac, CN=www' \
   --ca-cert secrets/ca.crt \
   --ca-key  secrets/ca.key \
   --cert secrets/www.crt \
