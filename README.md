@@ -3,12 +3,12 @@
 
 ```
   ./pyki ca \
-  --dn 'C=UK, S=Wales, O=Mac, CN=CA' \
+  --subject 'C=UK, S=Wales, O=Mac, CN=CA' \
   --ca-cert secrets/ca.crt \
   --ca-key  secrets/ca.key
 
 ./pyki cert \
-  --dn 'C=UK, S=Wales, O=Mac, CN=www' \
+  --subject 'C=UK, S=Wales, O=Mac, CN=www' \
   --ca-cert secrets/ca.crt \
   --ca-key  secrets/ca.key \
   --cert secrets/www.crt \
@@ -16,4 +16,10 @@
   --san 'DNS:mac.wales' \
   --san 'DNS:www.mac.wales' \
   --san 'IP:192.168.0.1'
+```
+
+Test Application
+```
+./server.py &
+curl -vvv --cacert secrets/ca.crt https://www.mac.wales:4443
 ```
