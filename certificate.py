@@ -27,6 +27,7 @@ class Certificate:
     def load(path):
         new = Certificate(None, None, None)
         new.cert = Certificate.x509_load(path)
+        new.subject = str(DN(new.cert.subject))
         return new
 
     def save(self, path):
@@ -54,10 +55,6 @@ class Certificate:
     @property
     def issuer(self):
         return str(DN(self.cert.issuer))
-
-    #@property
-    #def subject(self):
-    #    return str(DN(self.cert.subject))
 
     def pem(self):
        return self.cert.public_bytes(encoding=serialization.Encoding.PEM).decode("utf-8")
