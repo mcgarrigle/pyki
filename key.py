@@ -4,19 +4,22 @@ from cryptography.hazmat.primitives import serialization
 
 class Key:
 
+    def __init__(self, key):
+        self.key = key
+
     @staticmethod
     def generate(key_size=2048):
-        k = Key()
-        k.key = rsa.generate_private_key(public_exponent=65537, key_size=key_size)
-        return k
+        return Key(rsa.generate_private_key(public_exponent=65537, key_size=key_size))
+
+    @staticmethod
+    def load_pem_file(path):
+        with open(path) as f:
+            pem = bytearray(f.read(), "utf8")
+            return serialization.load_pem_private_key(pem, password=None)
 
     @staticmethod
     def load(path):
-        with open(path) as f:
-            pem = bytearray(f.read(), "utf8")
-            k = Key()
-            k.key = serialization.load_pem_private_key(pem, password=None)
-        return k
+        return Key(Key.load_pem_file(path))
 
     @staticmethod
     def new(path, key_size = 2048):
