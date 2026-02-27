@@ -2,9 +2,9 @@ import os
 
 from cryptography import x509
 from cryptography.hazmat.primitives.serialization import pkcs12, BestAvailableEncryption
-from key import Key
-from certificate import Certificate
-from san import SAN
+from lib.key import Key
+from lib.certificate import Certificate
+from lib.san import SAN
 
 class Command:
 
