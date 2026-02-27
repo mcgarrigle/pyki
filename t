@@ -5,6 +5,10 @@ header() {
   echo "--- $1 --------------"
 }
 
+ipaddr() {
+	ip route get 1 | awk '{print $(NF-2);exit}'
+}
+
 key() {
   header "key $1"
   openssl rsa -in $1 -text -noout |grep Private
@@ -30,7 +34,15 @@ rm -f secrets/*.{key,crt,p12}
   --key  secrets/www.key \
   --san 'DNS:mac.wales' \
   --san 'DNS:www.mac.wales' \
-  --san 'IP:192.168.0.1'
+	--san "IP:$(ipaddr)"
+
+./pyki ssc \
+  --subject 'C=UK, S=Wales, O=Mac, CN=www' \
+  --cert secrets/ssc.crt \
+  --key  secrets/ssc.key \
+  --san 'DNS:mac.wales' \
+  --san 'DNS:secrets.mac.wales' \
+	--san "IP:$(ipaddr)"
 
 ./pyki pkcs12 \
   --keystore secrets/www.p12 \
@@ -41,9 +53,11 @@ rm -f secrets/*.{key,crt,p12}
 
 key secrets/ca.key
 key secrets/www.key
+key secrets/ssc.key
 
 cert secrets/ca.crt
 cert secrets/www.crt
+cert secrets/ssc.crt
 
 header "verify www.crt"
 openssl verify -verbose -CAfile secrets/ca.crt secrets/www.crt
