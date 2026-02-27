@@ -37,6 +37,19 @@ class Command:
         cert.sign(subject, ca_key, expires)
         cert.save(ca_cert_path)
 
+    def ssc(self, subject, ss_key_path, ss_cert_path, san_list, expires, key_size):
+        ss_key     = Key.new(ss_key_path, key_size)
+        basic      = x509.BasicConstraints(ca=False, path_length=None) 
+        usage      = self.key_usage(key_encipherment=True)
+        extended   = x509.ExtendedKeyUsage([ x509.oid.ExtendedKeyUsageOID.SERVER_AUTH, x509.oid.ExtendedKeyUsageOID.CLIENT_AUTH ])
+        extensions = [ (basic, False), (usage, True), (extended, False) ]
+        if san_list:
+            san = SAN(san_list)
+            extensions.append((san.value, False))
+        cert = Certificate(subject, ss_key, extensions)
+        cert.sign(subject, ss_key, expires)
+        cert.save(ss_cert_path)
+
     def cert(self, subject, key_path, cert_path, ca_key_path, ca_cert_path, san_list, expires, key_size):
         key        = Key.new(key_path, key_size)
         ca_key     = Key.load(ca_key_path)
