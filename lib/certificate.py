@@ -4,8 +4,8 @@ from cryptography.hazmat.primitives import serialization
 import datetime
 import ipaddress
 
-from dn import DN
-from san import SAN
+from lib.dn import DN
+from lib.san import SAN
 
 class Certificate:
 
